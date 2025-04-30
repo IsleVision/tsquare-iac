@@ -27,8 +27,8 @@ export class TsquareIacStack extends cdk.Stack {
 
     // Create an RDS PostgreSQL instance
     const database = new rds.DatabaseInstance(this, 'Database', {
-      engine: rds.DatabaseInstanceEngine.postgres({ version: rds.PostgresEngineVersion.VER_13 }),
-      instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE2, ec2.InstanceSize.MICRO),
+      engine: rds.DatabaseInstanceEngine.postgres({ version: rds.PostgresEngineVersion.VER_16 }),
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3, ec2.InstanceSize.MICRO),
       vpc,
       credentials: rds.Credentials.fromGeneratedSecret('postgres'),
       multiAz: false,
@@ -64,8 +64,8 @@ export class TsquareIacStack extends cdk.Stack {
         `export DATABASE_HOST=${database.dbInstanceEndpointAddress}`,
         `export DATABASE_PORT=${database.dbInstanceEndpointPort}`,
         `export DATABASE_NAME=${database.instanceIdentifier}`,
-        `export DATABASE_USER=${database.secret?.secretValueFromJson('username').toString()}`,
-        `export DATABASE_PASSWORD=${database.secret?.secretValueFromJson('password').toString()}`,
+        `export DATABASE_USER=${database.secret?.secretValueFromJson('username').unsafeUnwrap()}`,
+        `export DATABASE_PASSWORD=${database.secret?.secretValueFromJson('password').unsafeUnwrap()}`,
         `export QUEUE_URL=${queue.queueUrl}`,
         `export BUCKET_NAME=${bucket.bucketName}`,
         // Initialize the database table
