@@ -1,11 +1,11 @@
-// src/worker/index.ts
-import AWS from 'aws-sdk';
+import {SQS, Message} from '@aws-sdk/client-sqs';
+import {S3} from '@aws-sdk/client-s3';
 import { Client } from 'pg';
 import * as fs from 'fs';
 import * as path from 'path';
 
-const s3 = new AWS.S3();
-const sqs = new AWS.SQS();
+const s3 = new S3();
+const sqs = new SQS();
 const client = new Client({
   host: process.env.DATABASE_HOST,
   port: parseInt(process.env.DATABASE_PORT || '5432', 10),
@@ -19,7 +19,7 @@ client.connect();
 const queueUrl = process.env.QUEUE_URL;
 const bucketName = process.env.BUCKET_NAME;
 
-async function processMessage(message: AWS.SQS.Message) {
+async function processMessage(message: Message) {
   if (!message.Body) return;
 
   const job = JSON.parse(message.Body);
@@ -44,7 +44,7 @@ async function processMessage(message: AWS.SQS.Message) {
 
     // Emulate 3-second rendering delay
     await new Promise((resolve) => setTimeout(resolve, 3000));
-    await s3.upload(s3Params).promise();
+    await s3.putObject(s3Params);
 
     await client.query(
       'UPDATE jobs SET status = $1, result_url = $2, updated_at = NOW() WHERE job_id = $3',
@@ -59,7 +59,7 @@ async function processMessage(message: AWS.SQS.Message) {
       ReceiptHandle: message.ReceiptHandle!,
     };
 
-    await sqs.deleteMessage(deleteParams).promise();
+    await sqs.deleteMessage(deleteParams);
   } catch (error) {
     console.error('Error processing job:', error);
   }
@@ -73,7 +73,7 @@ async function pollQueue() {
   };
 
   try {
-    const data = await sqs.receiveMessage(params).promise();
+    const data = await sqs.receiveMessage(params);
 
     if (data?.Messages) {
       for (const message of data.Messages) {

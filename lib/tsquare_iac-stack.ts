@@ -44,22 +44,29 @@ export class TsquareIacStack extends cdk.Stack {
     // Create a single EC2 instance for API and Worker
     const apiWorkerInstance = new ec2.Instance(this, 'ApiWorkerInstance', {
       vpc,
-      instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE2, ec2.InstanceSize.MICRO),
-      machineImage: ec2.MachineImage.latestAmazonLinux2(),
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3, ec2.InstanceSize.SMALL),
+      machineImage: ec2.MachineImage.latestAmazonLinux2023(),
       role,
+      vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
+      associatePublicIpAddress: true,
     });
+
+    // Allow public inbound access on port 3000
+    apiWorkerInstance.connections.allowFromAnyIpv4(ec2.Port.tcp(3000), 'Allow API traffic');
 
     // Copy your application code to the EC2 instance
     const userData = ec2.UserData.forLinux();
     userData.addCommands(
         'yum update -y',
-        'yum install -y nodejs npm',
+        'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash',
+        'source ~/.bashrc',
+        'nvm install v22',
         'mkdir -p /home/ec2-user/app',
         'cd /home/ec2-user/app',
-        'curl -L https://github.com/IsleVision/tsquare-iac/archive/refs/heads/main.zip -o main.zip',
-        'unzip main.zip',
-        'mv tsquare-iac-main/* .',
-        'rm -rf tsquare-iac-main main.zip',
+        'curl -L https://github.com/IsleVision/tsquare-iac/archive/refs/heads/master.zip -o master.zip',
+        'unzip master.zip',
+        'mv tsquare-iac-master/* .',
+        'rm -rf tsquare-iac-master master.zip',
         'npm install',
         `export DATABASE_HOST=${database.dbInstanceEndpointAddress}`,
         `export DATABASE_PORT=${database.dbInstanceEndpointPort}`,

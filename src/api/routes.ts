@@ -1,12 +1,11 @@
 import express from 'express';
-import AWS from 'aws-sdk';
+import {SQS} from '@aws-sdk/client-sqs';
 import {v4 as uuidv4} from 'uuid';
 import {Client} from 'pg';
 
 const router = express.Router();
 
-const s3 = new AWS.S3();
-const sqs = new AWS.SQS();
+const sqs = new SQS();
 
 const client = new Client({
     host: process.env.DATABASE_HOST,
@@ -34,7 +33,7 @@ router.post('/jobs',
                 MessageBody: JSON.stringify({jobId, designId, camera, userId}),
             };
 
-            await sqs.sendMessage(params).promise();
+            await sqs.sendMessage(params);
 
             res.status(201).json({jobId});
         } catch (error) {
