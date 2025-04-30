@@ -23,10 +23,10 @@ Ensure you have the following installed:
 | `npm run build` | Compiles TypeScript code into JavaScript. |
 | `npm run watch` | Watches for changes and compiles automatically. |
 | `npm run test` | Runs Jest unit tests. |
-| `npx cdk synth` | Synthesizes the CDK stack into a CloudFormation template. |
-| `npx cdk deploy` | Deploys the stack to your default AWS account/region. |
-| `npx cdk diff` | Compares deployed stack with current state. |
-| `npx cdk destroy` | Removes all resources deployed by the stack. |
+| `cdk synth` | Synthesizes the CDK stack into a CloudFormation template. |
+| `cdk deploy` | Deploys the stack to your default AWS account/region. |
+| `cdk diff` | Compares deployed stack with current state. |
+| `cdk destroy` | Removes all resources deployed by the stack. |
 
 ## Architecture Overview
 
