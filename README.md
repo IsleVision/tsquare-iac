@@ -11,7 +11,7 @@ The application includes:
 
 ### Prerequisites
 Ensure you have the following installed:
-- [Node.js](https://nodejs.org) (v14.x or later)
+- [Node.js](https://nodejs.org) (v18.x or later)
 - [npm](https://www.npmjs.com/)
 - [AWS CLI](https://aws.amazon.com/cli/) configured with your credentials
 - [AWS CDK CLI](https://docs.aws.amazon.com/cdk/v2/guide/cli.html): Install via `npm install -g aws-cdk`
